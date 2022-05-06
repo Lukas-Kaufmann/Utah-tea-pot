@@ -6,6 +6,7 @@ build/
 target/
 **node_modules**
 **build**
+!build.gradle
 
 ### STS ###
 .apt_generated
