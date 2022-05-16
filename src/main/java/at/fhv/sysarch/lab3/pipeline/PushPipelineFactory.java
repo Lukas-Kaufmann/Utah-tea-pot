@@ -28,21 +28,27 @@ public class PushPipelineFactory {
     }
 
     public static AnimationTimer createPipeline(PipelineData pd) {
+        //TODO remove this filter
+        IFilter<Face, Face> debugMover = new MovingFilter<>(new Vec4(300, 300, 0, 0));
+
         IFilter<Model, Face> source = new ModelSource<>();
         IFilter<Face, Face> scaler = new ScalerFilter<>();
-        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode(), pd.getModelColor());
-        IFilter<Face, Face> mover = new MovingFilter<>(new Vec4(300, 100, 0, 0));
-        RotationAnimationFilter<Face> rotator = new RotationAnimationFilter<>();
+        ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
+        IFilter<Face, Face> backFaceCuller = new BackfaceCuller();
 
-        chainFilters(source, rotator, scaler, mover, sink);
+        //dont know if these are in "correct" place or generified "correctly"
+        IFilter<Face, Face> viewPortTrans = new ViewPortTransformation(pd.getViewportTransform());
+        IFilter<Face, Face> projectionTrans = new ProjectionTransformation(pd.getProjTransform());
+
+        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode(), pd.getModelColor());
+
+        chainFilters(source, scaler, modelViewTrans, backFaceCuller, debugMover, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
 
         // TODO 2. perform backface culling in VIEW SPACE
 
         // TODO 3. perform depth sorting in VIEW SPACE
-
-        // TODO 4. add coloring (space unimportant)
 
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
@@ -78,13 +84,7 @@ public class PushPipelineFactory {
                         (float) currentRotation,
                         pd.getModelRotAxis()
                 );
-                rotator.setRotationMatrix(rotationMatrix);
-
-                // TODO compute updated model-view tranformation
-
-                // TODO update model-view filter
-
-                // TODO trigger rendering of the pipeline
+                modelViewTrans.setRotationMatrix(rotationMatrix);
 
                 source.write(model);
             }

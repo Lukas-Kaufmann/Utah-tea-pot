@@ -8,10 +8,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Renderer<I extends Face> implements IFilter<I, Face> {
-    private GraphicsContext context;
-    private RenderingMode rm;
+    private final GraphicsContext context;
+    private final RenderingMode rm;
 
-    private Color color;
+    private final Color color;
 
     public Renderer(GraphicsContext context, RenderingMode rm, Color color) {
         this.context = context;
@@ -30,16 +30,14 @@ public class Renderer<I extends Face> implements IFilter<I, Face> {
 
         if(rm == RenderingMode.POINT) {
             context.fillOval(face.getV1().getX(), face.getV1().getY(), 5,5);
-        }
-        else if (rm == RenderingMode.FILLED) {
+        } else {
             final double[] xPoints = new double[] {face.getV1().getX(), face.getV2().getX(), face.getV3().getX()};
             final double[] yPoints = new double[] {face.getV1().getY(), face.getV2().getY(), face.getV3().getY()};
-            context.fillPolygon(xPoints, yPoints, 3);
-        }
-        else {
-            context.strokeLine(face.getV1().getX(), face.getV1().getY(), face.getV2().getX(), face.getV2().getY());
-            context.strokeLine(face.getV1().getX(), face.getV1().getY(), face.getV3().getX(), face.getV3().getY());
-            context.strokeLine(face.getV2().getX(), face.getV2().getY(), face.getV3().getX(), face.getV3().getY());
+            if (rm == RenderingMode.FILLED) {
+                context.fillPolygon(xPoints, yPoints, 3);
+            } else {
+                context.strokePolygon(xPoints, yPoints, 3);
+            }
         }
     }
 }
