@@ -1,10 +1,12 @@
-package at.fhv.sysarch.lab3.pipeline;
+package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
+import at.fhv.sysarch.lab3.pipeline.IFilter;
+import at.fhv.sysarch.lab3.pipeline.Pipe;
 import at.fhv.sysarch.lab3.rendering.RenderingMode;
 import javafx.scene.canvas.GraphicsContext;
 
-public class Renderer<I extends Face> implements IFilter<I> {
+public class Renderer<I extends Face> implements IFilter<I, Face> {
     private GraphicsContext context;
     private RenderingMode rm;
 

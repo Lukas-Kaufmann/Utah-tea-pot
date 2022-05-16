@@ -1,9 +1,11 @@
-package at.fhv.sysarch.lab3.pipeline;
+package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
+import at.fhv.sysarch.lab3.pipeline.IFilter;
+import at.fhv.sysarch.lab3.pipeline.Pipe;
 import com.hackoeur.jglm.Vec4;
 
-public class MovingFilter<I extends Face> implements IFilter<I> {
+public class MovingFilter<I extends Face> implements IFilter<I, Face> {
 
     private Vec4 step;
     private Pipe successor;

@@ -1,9 +1,11 @@
-package at.fhv.sysarch.lab3.pipeline;
+package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
+import at.fhv.sysarch.lab3.pipeline.IFilter;
+import at.fhv.sysarch.lab3.pipeline.Pipe;
 
-public class ModelSource<I extends Model> implements IFilter<I> {
+public class ModelSource<I extends Model> implements IFilter<I, Face> {
 
     private Pipe pipeSuccessor;
 

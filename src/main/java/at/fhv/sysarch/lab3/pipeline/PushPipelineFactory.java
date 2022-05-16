@@ -3,6 +3,7 @@ package at.fhv.sysarch.lab3.pipeline;
 import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
+import at.fhv.sysarch.lab3.pipeline.filter.*;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Vec4;
@@ -27,13 +28,13 @@ public class PushPipelineFactory {
     }
 
     public static AnimationTimer createPipeline(PipelineData pd) {
-        IFilter source = new ModelSource<>();
-        IFilter filter = new ModelFilter();
-        IFilter sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
-        IFilter mover = new MovingFilter(new Vec4(300, 100, 0, 0));
-        RotationAnimationFilter rotater = new RotationAnimationFilter();
+        IFilter<Model, Face> source = new ModelSource<>();
+        IFilter<Face, Face> scaler = new ScalerFilter<>();
+        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode());
+        IFilter<Face, Face> mover = new MovingFilter<>(new Vec4(300, 100, 0, 0));
+        RotationAnimationFilter<Face> rotator = new RotationAnimationFilter<>();
 
-        chainFilters(source, filter, rotater, mover, sink);
+        chainFilters(source, rotator, scaler, mover, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
 
@@ -77,7 +78,7 @@ public class PushPipelineFactory {
                         (float) currentRotation,
                         pd.getModelRotAxis()
                 );
-                rotater.setRotationMatrix(rotationMatrix);
+                rotator.setRotationMatrix(rotationMatrix);
 
                 // TODO compute updated model-view tranformation
 

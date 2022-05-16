@@ -4,7 +4,7 @@ import at.fhv.sysarch.lab3.obj.Face;
 import com.hackoeur.jglm.Vec4;
 
 // TODO: how can pipes be used for different data types?
-public class Pipe {
+public class Pipe<O> {
 
     private IFilter successor;
 
@@ -12,8 +12,8 @@ public class Pipe {
         this.successor = sink;
     }
 
-    public void write(Face face) {
-        this.successor.write(face);
+    public void write(O o) {
+        this.successor.write(o);
     }
 
 }
