@@ -16,20 +16,24 @@ public class PushPipelineFactory {
         pipe.setSuccessor(filter2);
         filter1.setPipeSuccessor(pipe);
     }
-    public static AnimationTimer createPipeline(PipelineData pd) {
-        // TODO: push from the source (model)
 
-        // TODO: the connection of filters and pipes requires a lot of boilerplate code. Think about options how this can be minimized
-        IFilter source = new ModelSource<Model>();
+    public static void chainFilters(IFilter... filters) {
+        if (filters.length <= 1) {
+            return;
+        }
+        for (int i = 0; i < filters.length - 1; i+=1) {
+            connectFilters(filters[i], filters[i+1]);
+        }
+    }
+
+    public static AnimationTimer createPipeline(PipelineData pd) {
+        IFilter source = new ModelSource<>();
         IFilter filter = new ModelFilter();
         IFilter sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
         IFilter mover = new MovingFilter(new Vec4(300, 100, 0, 0));
         RotationAnimationFilter rotater = new RotationAnimationFilter();
 
-        connectFilters(source, filter);
-        connectFilters(filter, rotater);
-        connectFilters(rotater, mover);
-        connectFilters(mover, sink);
+        chainFilters(source, filter, rotater, mover, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
 
@@ -56,7 +60,7 @@ public class PushPipelineFactory {
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the praction
         return new AnimationRenderer(pd) {
-            private double rotationPerSecond = Math.PI;
+            private double rotationPerSecond = 1;
             private double currentRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
@@ -68,14 +72,11 @@ public class PushPipelineFactory {
             protected void render(float fraction, Model model) {
                 currentRotation += rotationPerSecond * fraction;
                 currentRotation = currentRotation % (Math.PI * 2);
-                // TODO compute rotation in radians
 
-                // TODO create new model rotation matrix using pd.modelRotAxis
                 Mat4 rotationMatrix = Matrices.rotate(
                         (float) currentRotation,
                         pd.getModelRotAxis()
                 );
-                //TODO set this value in the rotating filter
                 rotater.setRotationMatrix(rotationMatrix);
 
                 // TODO compute updated model-view tranformation
@@ -84,7 +85,6 @@ public class PushPipelineFactory {
 
                 // TODO trigger rendering of the pipeline
 
-                // line
                 pd.getGraphicsContext().setStroke(Color.PINK);
 
                 source.write(model);

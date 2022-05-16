@@ -1,5 +1,6 @@
 package at.fhv.sysarch.lab3.obj;
 
+import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Vec4;
 
 public class Face {
@@ -10,6 +11,16 @@ public class Face {
     private Vec4 n1;
     private Vec4 n2;
     private Vec4 n3;
+
+    public Face multiply(Mat4 mat4) {
+        Vec4 v1 = mat4.multiply(this.v1);
+        Vec4 v2 = mat4.multiply(this.v2);
+        Vec4 v3 = mat4.multiply(this.v3);
+        Vec4 n1 = mat4.multiply(this.n1);
+        Vec4 n2 = mat4.multiply(this.n2);
+        Vec4 n3 = mat4.multiply(this.n3);
+        return new Face(v1, v2, v3, n1, n2, n3);
+    }
 
     public Face(Vec4 v1, Vec4 v2, Vec4 v3,
     Vec4 n1, Vec4 n2, Vec4 n3) {
