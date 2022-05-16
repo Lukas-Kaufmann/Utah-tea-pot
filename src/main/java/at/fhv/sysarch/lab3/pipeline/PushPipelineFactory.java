@@ -1,6 +1,7 @@
 package at.fhv.sysarch.lab3.pipeline;
 
 import at.fhv.sysarch.lab3.animation.AnimationRenderer;
+import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
@@ -23,9 +24,11 @@ public class PushPipelineFactory {
         IFilter filter = new ModelFilter();
         IFilter sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
         IFilter mover = new MovingFilter(new Vec4(300, 100, 0, 0));
+        RotationAnimationFilter rotater = new RotationAnimationFilter();
 
         connectFilters(source, filter);
-        connectFilters(filter, mover);
+        connectFilters(filter, rotater);
+        connectFilters(rotater, mover);
         connectFilters(mover, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
@@ -53,9 +56,8 @@ public class PushPipelineFactory {
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the praction
         return new AnimationRenderer(pd) {
-            // TODO rotation variable goes in here
             private double rotationPerSecond = Math.PI;
-            private double currentRotation= 0;
+            private double currentRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
              * system (using an AnimationTimer, see AnimationRenderer). 
@@ -74,6 +76,7 @@ public class PushPipelineFactory {
                         pd.getModelRotAxis()
                 );
                 //TODO set this value in the rotating filter
+                rotater.setRotationMatrix(rotationMatrix);
 
                 // TODO compute updated model-view tranformation
 
