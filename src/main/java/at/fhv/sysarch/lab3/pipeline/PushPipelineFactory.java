@@ -30,7 +30,7 @@ public class PushPipelineFactory {
     public static AnimationTimer createPipeline(PipelineData pd) {
         IFilter<Model, Face> source = new ModelSource<>();
         IFilter<Face, Face> scaler = new ScalerFilter<>();
-        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode());
+        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode(), pd.getModelColor());
         IFilter<Face, Face> mover = new MovingFilter<>(new Vec4(300, 100, 0, 0));
         RotationAnimationFilter<Face> rotator = new RotationAnimationFilter<>();
 
@@ -85,8 +85,6 @@ public class PushPipelineFactory {
                 // TODO update model-view filter
 
                 // TODO trigger rendering of the pipeline
-
-                pd.getGraphicsContext().setStroke(Color.PINK);
 
                 source.write(model);
             }
