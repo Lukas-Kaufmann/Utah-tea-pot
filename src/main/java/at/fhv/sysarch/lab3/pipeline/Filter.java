@@ -6,15 +6,13 @@ public class Filter<I, O> implements IFilter<I, O> {
     private Pipe<I> predecessor;
     private ITransformer<I, O> transformer;
 
-    public static <A, B> Filter<A, B> ofTransformer(ITransformer<A, B> t) {
-        return new Filter<>(t);
-    }
 
     public Filter(ITransformer<I, O> transformer) {
         this.transformer = transformer;
     }
 
     public O read() {
+        //TODO null handling
         return this.transformer.transform(this.predecessor.read());
     }
 
@@ -24,7 +22,6 @@ public class Filter<I, O> implements IFilter<I, O> {
             this.successor.write(result);
         }
     }
-
 
     public void setSuccessor(Pipe<O> successor) {
         this.successor = successor;

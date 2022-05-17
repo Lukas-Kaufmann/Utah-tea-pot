@@ -1,5 +1,6 @@
 package at.fhv.sysarch.lab3.pipeline.filter;
 
+import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
@@ -7,16 +8,14 @@ import at.fhv.sysarch.lab3.rendering.RenderingMode;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Renderer<I extends Face> implements IFilter<I, Face> {
+public class Renderer implements IFilter<ColoredFace, Face> {
     //TODO special consumer class
     private final GraphicsContext context;
     private final RenderingMode rm;
-    private final Color color;
 
-    public Renderer(GraphicsContext context, RenderingMode rm, Color color) {
+    public Renderer(GraphicsContext context, RenderingMode rm) {
         this.context = context;
         this.rm = rm;
-        this.color = color;
     }
 
     @Override
@@ -24,9 +23,9 @@ public class Renderer<I extends Face> implements IFilter<I, Face> {
         return null;
     }
 
-    public void write(I face) {
-        context.setFill(this.color);
-        context.setStroke(this.color);
+    public void write(ColoredFace face) {
+        context.setFill(face.getColor());
+        context.setStroke(face.getColor());
 
         if(rm == RenderingMode.POINT) {
             context.fillOval(face.getV1().getX(), face.getV1().getY(), 5,5);
@@ -43,11 +42,11 @@ public class Renderer<I extends Face> implements IFilter<I, Face> {
 
     @Override
     public void setSuccessor(Pipe<Face> successor) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void setPredecessor(Pipe<I> predecessor) {
-        //TODO
+    public void setPredecessor(Pipe<ColoredFace> predecessor) {
+        //TODO, for pull pipeline
     }
 }

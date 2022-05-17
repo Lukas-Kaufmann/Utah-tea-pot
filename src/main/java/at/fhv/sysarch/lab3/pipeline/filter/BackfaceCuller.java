@@ -23,7 +23,6 @@ public class BackfaceCuller implements ITransformer<Face, Face> {
         if (v1Before || v2Before || v3Before) {
             return face;
         }
-        //TODO handle null in Filter
         return null;
     }
 }

@@ -5,7 +5,7 @@ package at.fhv.sysarch.lab3.pipeline;
 // TODO: Can you use one interface for both implementations (push and pull)? Or do they require specific interfaces?
 public interface IFilter<I, O> {
 
-    public static <A, B> Filter<A, B> ofTransformer(ITransformer<A, B> t) {
+    public static <A, B> IFilter<A, B> ofTransformer(ITransformer<A, B> t) {
         return new Filter<>(t);
     }
     O read();

@@ -1,6 +1,7 @@
 package at.fhv.sysarch.lab3.pipeline;
 
 import at.fhv.sysarch.lab3.animation.AnimationRenderer;
+import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
 import at.fhv.sysarch.lab3.pipeline.filter.*;
@@ -12,13 +13,17 @@ import javafx.scene.paint.Color;
 
 public class PushPipelineFactory {
 
-    public static void connectFilters(IFilter filter1, IFilter filter2) {
+    public static void connectFilters(IFilter<?, ?> filter1, IFilter<?, ?> filter2) {
         Pipe pipe = new Pipe();
         pipe.setSuccessor(filter2);
         filter1.setSuccessor(pipe);
     }
 
-    public static void chainFilters(IFilter... filters) {
+    /**Assumes the parameters are matching (e.g. filter1 = IFilter<?, O>, filter2 = Filter&lt;O, ?>)
+     * as assignments are done with Raw references, else this kind of function is impossible.
+     * @param filters
+     */
+    public static void chainFilters(IFilter<?, ?>... filters) {
         if (filters.length <= 1) {
             return;
         }
@@ -29,48 +34,38 @@ public class PushPipelineFactory {
 
     public static AnimationTimer createPipeline(PipelineData pd) {
         //TODO remove this filter
-        IFilter<Face, Face> debugMover = Filter.ofTransformer(new MovingFilter<>(new Vec4(300, 200, 0, 0)));
+        IFilter<Face, Face> debugMover = IFilter.ofTransformer(new MovingFilter<>(new Vec4(300, 200, 0, 0)));
 
         IFilter<Model, Face> source = new ModelSource<>();
-        IFilter<Face, Face> scaler = Filter.ofTransformer(new ScalerFilter<>(-100));
+        IFilter<Face, Face> scaler = IFilter.ofTransformer(new ScalerFilter<>(-100));
+        System.out.println(pd.getModelColor());
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
-        IFilter<Face, Face> modelViewFilter = Filter.ofTransformer(modelViewTrans);
-        IFilter<Face, Face> backFaceCuller = Filter.ofTransformer(new BackfaceCuller());
+        IFilter<Face, Face> modelViewFilter = IFilter.ofTransformer(modelViewTrans);
+        IFilter<Face, Face> backFaceCuller = IFilter.ofTransformer(new BackfaceCuller());
 
-        //TODO move lightning to if
+        IFilter<Face, ColoredFace> shadingFilter = IFilter.ofTransformer(new ShadingTransformer(pd.getModelColor()));
 
-//        //dont know if these are in "correct" place or generified "correctly"
-//        Filter<Face, Face> viewPortTrans = new ViewPortTransformation(pd.getViewportTransform());
-//        Filter<Face, Face> projectionTrans = new ProjectionTransformation(pd.getProjTransform());
-
-        IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode(), pd.getModelColor());
-//        modelViewFilter, backFaceCuller, debugMover,
-        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, sink);
+        IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
+        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, shadingFilter, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
-
         // TODO 2. perform backface culling in VIEW SPACE
-
         // TODO 3. perform depth sorting in VIEW SPACE
 
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
             // 4a. TODO perform lighting in VIEW SPACE
-            
             // 5. TODO perform projection transformation on VIEW SPACE coordinates
         } else {
             // 5. TODO perform projection transformation
         }
-
         // TODO 6. perform perspective division to screen coordinates
-
         // TODO 7. feed into the sink (renderer)
 
-
         // returning an animation renderer which handles clearing of the
-        // viewport and computation of the praction
+        // viewport and computation of the fraction
         return new AnimationRenderer(pd) {
-            private double rotationPerSecond = 1;
+            private double rotationPerSecond = 2;
             private double currentRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
