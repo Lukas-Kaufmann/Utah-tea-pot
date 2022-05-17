@@ -3,8 +3,11 @@ package at.fhv.sysarch.lab3.pipeline.filter;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
+import at.fhv.sysarch.lab3.pipeline.ITransformer;
 
-public class BackfaceCuller implements IFilter<Face, Face> {
+
+
+public class BackfaceCuller implements ITransformer<Face, Face> {
 
     private Pipe<Face> successor;
 
@@ -12,18 +15,15 @@ public class BackfaceCuller implements IFilter<Face, Face> {
     }
 
     @Override
-    public void setPipeSuccessor(Pipe<Face> pipe) {
-        this.successor = pipe;
-    }
-
-    @Override
-    public void write(Face input) {
-        boolean v1Before = input.getV1().dot(input.getN1()) > 0;
-        boolean v2Before = input.getV2().dot(input.getN2()) > 0;
-        boolean v3Before = input.getV3().dot(input.getN3()) > 0;
+    public Face transform(Face face) {
+        boolean v1Before = face.getV1().dot(face.getN1()) < 0;
+        boolean v2Before = face.getV2().dot(face.getN2()) < 0;
+        boolean v3Before = face.getV3().dot(face.getN3()) < 0;
 
         if (v1Before || v2Before || v3Before) {
-            this.successor.write(input);
+            return face;
         }
+        //TODO handle null in Filter
+        return null;
     }
 }

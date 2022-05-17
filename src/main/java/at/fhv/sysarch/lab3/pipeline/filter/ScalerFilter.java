@@ -1,19 +1,22 @@
 package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
-import at.fhv.sysarch.lab3.pipeline.IFilter;
+import at.fhv.sysarch.lab3.pipeline.ITransformer;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 
-public class ScalerFilter<I extends Face> implements IFilter<I, Face> {
+public class ScalerFilter<I extends Face> implements ITransformer<I, Face> {
 
-    private Pipe pipeSuccessor;
+    private Pipe<Face> pipeSuccessor;
 
-    public void setPipeSuccessor(Pipe pipe) {
-        this.pipeSuccessor = pipe;
+    private float factor;
+
+    public ScalerFilter(float factor) {
+        this.factor = factor;
     }
 
-    public void write(I face) {
-        Face newFace = new Face(face.getV1().multiply(100), face.getV2().multiply(100), face.getV3().multiply(100), face);
-        this.pipeSuccessor.write(newFace);
+    @Override
+    public Face transform(I input) {
+        Face newFace = new Face(input.getV1().multiply(this.factor), input.getV2().multiply(this.factor), input.getV3().multiply(this.factor), input);
+        return newFace;
     }
 }

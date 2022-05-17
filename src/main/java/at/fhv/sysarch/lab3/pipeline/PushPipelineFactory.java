@@ -15,7 +15,7 @@ public class PushPipelineFactory {
     public static void connectFilters(IFilter filter1, IFilter filter2) {
         Pipe pipe = new Pipe();
         pipe.setSuccessor(filter2);
-        filter1.setPipeSuccessor(pipe);
+        filter1.setSuccessor(pipe);
     }
 
     public static void chainFilters(IFilter... filters) {
@@ -29,20 +29,23 @@ public class PushPipelineFactory {
 
     public static AnimationTimer createPipeline(PipelineData pd) {
         //TODO remove this filter
-        IFilter<Face, Face> debugMover = new MovingFilter<>(new Vec4(300, 300, 0, 0));
+        IFilter<Face, Face> debugMover = Filter.ofTransformer(new MovingFilter<>(new Vec4(300, 200, 0, 0)));
 
         IFilter<Model, Face> source = new ModelSource<>();
-        IFilter<Face, Face> scaler = new ScalerFilter<>();
+        IFilter<Face, Face> scaler = Filter.ofTransformer(new ScalerFilter<>(-100));
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
-        IFilter<Face, Face> backFaceCuller = new BackfaceCuller();
+        IFilter<Face, Face> modelViewFilter = Filter.ofTransformer(modelViewTrans);
+        IFilter<Face, Face> backFaceCuller = Filter.ofTransformer(new BackfaceCuller());
 
-        //dont know if these are in "correct" place or generified "correctly"
-        IFilter<Face, Face> viewPortTrans = new ViewPortTransformation(pd.getViewportTransform());
-        IFilter<Face, Face> projectionTrans = new ProjectionTransformation(pd.getProjTransform());
+        //TODO move lightning to if
+
+//        //dont know if these are in "correct" place or generified "correctly"
+//        Filter<Face, Face> viewPortTrans = new ViewPortTransformation(pd.getViewportTransform());
+//        Filter<Face, Face> projectionTrans = new ProjectionTransformation(pd.getProjTransform());
 
         IFilter<Face, Face> sink = new Renderer<>(pd.getGraphicsContext(), pd.getRenderingMode(), pd.getModelColor());
-
-        chainFilters(source, scaler, modelViewTrans, backFaceCuller, debugMover, sink);
+//        modelViewFilter, backFaceCuller, debugMover,
+        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
 

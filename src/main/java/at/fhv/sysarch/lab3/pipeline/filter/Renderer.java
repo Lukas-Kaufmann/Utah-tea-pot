@@ -8,9 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Renderer<I extends Face> implements IFilter<I, Face> {
+    //TODO special consumer class
     private final GraphicsContext context;
     private final RenderingMode rm;
-
     private final Color color;
 
     public Renderer(GraphicsContext context, RenderingMode rm, Color color) {
@@ -20,8 +20,8 @@ public class Renderer<I extends Face> implements IFilter<I, Face> {
     }
 
     @Override
-    public void setPipeSuccessor(Pipe pipe) {
-        // TODO: think about how you organize your interfaces
+    public Face read() {
+        return null;
     }
 
     public void write(I face) {
@@ -39,5 +39,15 @@ public class Renderer<I extends Face> implements IFilter<I, Face> {
                 context.strokePolygon(xPoints, yPoints, 3);
             }
         }
+    }
+
+    @Override
+    public void setSuccessor(Pipe<Face> successor) {
+
+    }
+
+    @Override
+    public void setPredecessor(Pipe<I> predecessor) {
+        //TODO
     }
 }

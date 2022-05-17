@@ -2,11 +2,12 @@ package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
+import at.fhv.sysarch.lab3.pipeline.ITransformer;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 import com.hackoeur.jglm.Vec4;
 
 //TODO delete
-public class MovingFilter<I extends Face> implements IFilter<I, Face> {
+public class MovingFilter<I extends Face> implements ITransformer<I, Face> {
 
     private Vec4 step;
     private Pipe successor;
@@ -16,12 +17,7 @@ public class MovingFilter<I extends Face> implements IFilter<I, Face> {
     }
 
     @Override
-    public void setPipeSuccessor(Pipe pipe) {
-        this.successor = pipe;
-    }
-
-    @Override
-    public void write(I input) {
+    public Face transform(I input) {
         Face newFace = new Face(
                 input.getV1().add(step),
                 input.getV2().add(step),
@@ -30,6 +26,6 @@ public class MovingFilter<I extends Face> implements IFilter<I, Face> {
                 input.getN2(),
                 input.getN3()
         );
-        this.successor.write(newFace);
+        return newFace;
     }
 }
