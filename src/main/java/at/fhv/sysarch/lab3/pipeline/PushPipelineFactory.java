@@ -9,7 +9,6 @@ import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Vec4;
 import javafx.animation.AnimationTimer;
-import javafx.scene.paint.Color;
 
 public class PushPipelineFactory {
 
@@ -37,16 +36,17 @@ public class PushPipelineFactory {
         IFilter<Face, Face> debugMover = IFilter.ofTransformer(new MovingFilter<>(new Vec4(300, 200, 0, 0)));
 
         IFilter<Model, Face> source = new ModelSource<>();
-        IFilter<Face, Face> scaler = IFilter.ofTransformer(new ScalerFilter<>(-100));
-        System.out.println(pd.getModelColor());
+        IFilter<Face, Face> scaler = IFilter.ofTransformer(new ScalerFilter(-100));
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
         IFilter<Face, Face> modelViewFilter = IFilter.ofTransformer(modelViewTrans);
         IFilter<Face, Face> backFaceCuller = IFilter.ofTransformer(new BackfaceCuller());
 
-        IFilter<Face, ColoredFace> shadingFilter = IFilter.ofTransformer(new ShadingTransformer(pd.getModelColor()));
+        IFilter<Face, ColoredFace> coloringFilter = IFilter.ofTransformer(new ColorTransformer(pd.getModelColor()));
+        IFilter<ColoredFace, ColoredFace> shadingFilter = IFilter.ofTransformer(new ShadingTransformer(pd.getLightPos()));
 
         IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
-        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, shadingFilter, sink);
+
+        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, coloringFilter, shadingFilter, sink);
 
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
         // TODO 2. perform backface culling in VIEW SPACE
