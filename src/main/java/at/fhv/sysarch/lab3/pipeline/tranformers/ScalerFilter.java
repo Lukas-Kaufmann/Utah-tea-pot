@@ -1,9 +1,7 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
-import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.ITransformer;
-import at.fhv.sysarch.lab3.pipeline.Pipe;
 
 public class ScalerFilter implements ITransformer<Face, Face> {
 

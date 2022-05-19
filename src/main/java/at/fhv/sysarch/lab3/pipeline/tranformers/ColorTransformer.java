@@ -1,4 +1,4 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;

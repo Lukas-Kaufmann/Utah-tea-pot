@@ -17,9 +17,11 @@ public class Filter<I, O> implements IFilter<I, O> {
     }
 
     public void write(I i) {
-        O result = this.transformer.transform(i);
-        if (result != null) {
-            this.successor.write(result);
+        if (i != null) {
+            O result = this.transformer.transform(i);
+            if (result != null) {
+                this.successor.write(result);
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.pipeline.ITransformer;
@@ -11,14 +11,17 @@ public class ShadingTransformer implements ITransformer<ColoredFace, ColoredFace
     private Vec3 lightPos;
 
     public ShadingTransformer(Vec3 lightPos) {
-        this.lightPos = lightPos.multiply(-100);
+        this.lightPos = lightPos.multiply(100);
     }
 
     @Override
     public ColoredFace transform(ColoredFace coloredFace) {
         Color baseColor = coloredFace.getColor();
-        //TODO change brightness based on angle
-        Color shadedColor = baseColor.deriveColor(0, 1, 1, 1);
+        //TODO better center for face
+        Vec3 faceToLight = this.lightPos.subtract(coloredFace.getV1().toVec3());
+        double factor = faceToLight.getUnitVector().dot(coloredFace.getN3().toVec3());
+        double factorWithBaseBrightness = 0.5 + 0.5 * factor;
+        Color shadedColor = baseColor.deriveColor(0, 1, factorWithBaseBrightness, 1);
         coloredFace.setColor(shadedColor);
         return coloredFace;
     }

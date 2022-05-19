@@ -1,7 +1,6 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
 import at.fhv.sysarch.lab3.obj.Face;
-import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.ITransformer;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 import com.hackoeur.jglm.Mat4;

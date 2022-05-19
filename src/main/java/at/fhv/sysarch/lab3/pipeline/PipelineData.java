@@ -64,8 +64,7 @@ public class PipelineData {
 
             this.viewingCenter = new Vec3(0, 0, -5);
             this.viewingUp     = new Vec3(0, 1, 0);
-            this.viewingEye    = new Vec3(0, 0, 5);
-
+            this.viewingEye    = new Vec3(0, 0, 5); // old z 5
         }
 
         public Builder setRenderingMode(RenderingMode rm) {

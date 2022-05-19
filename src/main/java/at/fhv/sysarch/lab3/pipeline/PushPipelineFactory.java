@@ -4,7 +4,7 @@ import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
-import at.fhv.sysarch.lab3.pipeline.filter.*;
+import at.fhv.sysarch.lab3.pipeline.tranformers.*;
 import com.hackoeur.jglm.Mat4;
 import com.hackoeur.jglm.Matrices;
 import com.hackoeur.jglm.Vec4;
@@ -35,7 +35,7 @@ public class PushPipelineFactory {
         //TODO remove this filter
         IFilter<Face, Face> debugMover = IFilter.ofTransformer(new MovingFilter<>(new Vec4(300, 200, 0, 0)));
 
-        IFilter<Model, Face> source = new ModelSource<>();
+        IFilter<Model, Face> source = new ModelSource();
         IFilter<Face, Face> scaler = IFilter.ofTransformer(new ScalerFilter(-100));
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
         IFilter<Face, Face> modelViewFilter = IFilter.ofTransformer(modelViewTrans);
@@ -43,15 +43,14 @@ public class PushPipelineFactory {
 
         IFilter<Face, ColoredFace> coloringFilter = IFilter.ofTransformer(new ColorTransformer(pd.getModelColor()));
         IFilter<ColoredFace, ColoredFace> shadingFilter = IFilter.ofTransformer(new ShadingTransformer(pd.getLightPos()));
+        IFilter<ColoredFace, ColoredFace> viewPortFilter = IFilter.ofTransformer(new ViewPortTransformer(pd.getViewTransform()));
+        IFilter<ColoredFace, ColoredFace> projectionFilter = IFilter.ofTransformer(new ProjectionTransformer(pd.getProjTransform()));
 
         IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
 
         chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, coloringFilter, shadingFilter, sink);
-
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
-        // TODO 2. perform backface culling in VIEW SPACE
         // TODO 3. perform depth sorting in VIEW SPACE
-
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
             // 4a. TODO perform lighting in VIEW SPACE
@@ -65,7 +64,7 @@ public class PushPipelineFactory {
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the fraction
         return new AnimationRenderer(pd) {
-            private double rotationPerSecond = 2;
+            private double rotationPerSecond = 1;
             private double currentRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation

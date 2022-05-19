@@ -1,19 +1,20 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 
-public class ModelSource<I extends Model> implements IFilter<I, Face> {
+public class ModelSource implements IFilter<Model, Face> {
     //TODO generator class
     private Pipe<Face> successor;
 
-    public void write(I model) {
+    public void write(Model model) {
         for(Face face : model.getFaces()){
             // TODO: write face to next filter
             successor.write(face);
         }
+        successor.write(null);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class ModelSource<I extends Model> implements IFilter<I, Face> {
     }
 
     @Override
-    public void setPredecessor(Pipe<I> predecessor) {
+    public void setPredecessor(Pipe<Model> predecessor) {
 
     }
 }

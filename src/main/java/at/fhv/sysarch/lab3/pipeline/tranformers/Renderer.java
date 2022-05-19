@@ -1,4 +1,4 @@
-package at.fhv.sysarch.lab3.pipeline.filter;
+package at.fhv.sysarch.lab3.pipeline.tranformers;
 
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
@@ -6,7 +6,6 @@ import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 import at.fhv.sysarch.lab3.rendering.RenderingMode;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 public class Renderer implements IFilter<ColoredFace, Face> {
     //TODO special consumer class
