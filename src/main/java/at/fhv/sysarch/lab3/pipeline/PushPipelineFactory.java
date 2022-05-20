@@ -48,14 +48,15 @@ public class PushPipelineFactory {
 
         IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
 
-        chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, coloringFilter, shadingFilter, sink);
         // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
         // TODO 3. perform depth sorting in VIEW SPACE
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
             // 4a. TODO perform lighting in VIEW SPACE
             // 5. TODO perform projection transformation on VIEW SPACE coordinates
+            chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, coloringFilter, shadingFilter, sink);
         } else {
+            chainFilters(source, scaler, modelViewFilter, backFaceCuller, debugMover, coloringFilter, sink);
             // 5. TODO perform projection transformation
         }
         // TODO 6. perform perspective division to screen coordinates

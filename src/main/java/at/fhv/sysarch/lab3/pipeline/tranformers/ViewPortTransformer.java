@@ -22,8 +22,7 @@ public class ViewPortTransformer implements ITransformer<ColoredFace, ColoredFac
 
         Face dividedFace = new Face(v1, v2, v3, face);
         Face transformedFace = dividedFace.multiply(this.viewPortTrans);
-        ColoredFace newFace = new ColoredFace(transformedFace, face.getColor());
 
-        return newFace;
+        return new ColoredFace(transformedFace, face.getColor());
     }
 }

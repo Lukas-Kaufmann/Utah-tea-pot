@@ -31,10 +31,10 @@ public class Renderer implements IFilter<ColoredFace, Face> {
         } else {
             final double[] xPoints = new double[] {face.getV1().getX(), face.getV2().getX(), face.getV3().getX()};
             final double[] yPoints = new double[] {face.getV1().getY(), face.getV2().getY(), face.getV3().getY()};
+            context.strokePolygon(xPoints, yPoints, 3);
             if (rm == RenderingMode.FILLED) {
                 context.fillPolygon(xPoints, yPoints, 3);
             } else {
-                context.strokePolygon(xPoints, yPoints, 3);
             }
         }
     }
