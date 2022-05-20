@@ -24,16 +24,14 @@ public class ModelSource implements IFilter<Model, Face> {
         for(Face face : stepModel.getFaces()){
             successor.write(face);
         }
-        //remove if deepsorting wont be implemented in push factory
-//        new Face(Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO);
+        successor.write(Face.TERMINATING_FACE);
     }
-
     @Override
     public Face read() {
         if (this.iterator.hasNext()) {
             return this.iterator.next();
         }
-        return new Face(Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO);
+        return Face.TERMINATING_FACE;
     }
 
     @Override

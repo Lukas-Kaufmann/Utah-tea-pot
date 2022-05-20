@@ -27,7 +27,7 @@ public class Renderer implements IFilter<ColoredFace, Face> {
             if (face != null) {
                 this.paint(face);
                 //TODO better terminator-mechanism
-                if (face.getN1().equals(Vec4.VEC4_ZERO)) {
+                if (Face.isTerminatingFace(face)) {
                     looping = false;
                 }
             }

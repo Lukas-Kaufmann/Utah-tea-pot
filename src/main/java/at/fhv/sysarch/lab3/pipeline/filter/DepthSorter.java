@@ -25,7 +25,7 @@ public class DepthSorter implements IFilter<Face, Face> {
             while (looping) {
                 Face prevFace = this.predecessor.read();
                 if (prevFace != null) {
-                    if (prevFace.getN1().equals(Vec4.VEC4_ZERO)) { //TODO better terminator
+                    if (Face.isTerminatingFace(prevFace)) {
                         looping = false;
                     }
                     faceQueue.add(prevFace);
@@ -35,7 +35,7 @@ public class DepthSorter implements IFilter<Face, Face> {
         }
 
         Face face = faceQueue.poll();
-        if (face.getN1().equals(Vec4.VEC4_ZERO)) { //TODO better terminator
+        if (Face.isTerminatingFace(face)) {
             firstRead = true;
         }
         return face;

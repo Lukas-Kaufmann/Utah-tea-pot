@@ -12,6 +12,14 @@ public class Face {
     private Vec4 n2;
     private Vec4 n3;
 
+    //defining terminator via vectors because in filters new Faces are instantiated with the same values
+    public static Face TERMINATING_FACE = new Face(Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO, Vec4.VEC4_ZERO);
+
+    public static boolean isTerminatingFace(Face face) {
+        //only comparing normal vectors because position vectors will change values when translated (in projection and viewport)
+        return face.getN1().equals(Vec4.VEC4_ZERO) && face.getN2().equals(Vec4.VEC4_ZERO) && face.getN3().equals(Vec4.VEC4_ZERO);
+    }
+
     public Face multiply(Mat4 mat4) {
         Vec4 v1 = mat4.multiply(this.v1);
         Vec4 v2 = mat4.multiply(this.v2);
