@@ -1,16 +1,18 @@
-package at.fhv.sysarch.lab3.pipeline.tranformers;
+package at.fhv.sysarch.lab3.pipeline.filter;
 
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 import at.fhv.sysarch.lab3.rendering.RenderingMode;
+import com.hackoeur.jglm.Vec4;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Renderer implements IFilter<ColoredFace, Face> {
-    //TODO special consumer class
     private final GraphicsContext context;
     private final RenderingMode rm;
+
+    private Pipe<ColoredFace> predecessor;
 
     public Renderer(GraphicsContext context, RenderingMode rm) {
         this.context = context;
@@ -19,10 +21,25 @@ public class Renderer implements IFilter<ColoredFace, Face> {
 
     @Override
     public Face read() {
+        boolean looping = true;
+        while (looping) {
+            ColoredFace face = this.predecessor.read();
+            if (face != null) {
+                this.paint(face);
+                //TODO better terminator-mechanism
+                if (face.getN1().equals(Vec4.VEC4_ZERO)) {
+                    looping = false;
+                }
+            }
+        }
         return null;
     }
 
     public void write(ColoredFace face) {
+        this.paint(face);
+    }
+
+    private void paint(ColoredFace face) {
         context.setFill(face.getColor());
         context.setStroke(face.getColor());
 
@@ -46,6 +63,6 @@ public class Renderer implements IFilter<ColoredFace, Face> {
 
     @Override
     public void setPredecessor(Pipe<ColoredFace> predecessor) {
-        //TODO, for pull pipeline
+        this.predecessor = predecessor;
     }
 }

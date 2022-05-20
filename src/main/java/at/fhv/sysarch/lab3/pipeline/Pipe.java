@@ -1,12 +1,11 @@
 package at.fhv.sysarch.lab3.pipeline;
 
-// TODO: how can pipes be used for different data types?
 public class Pipe<O> {
 
     private IFilter<?, O> predecessor;
     private IFilter<O, ?> successor;
 
-    public void setPredecessor(Filter<?, O> predecessor) {
+    public void setPredecessor(IFilter<?, O> predecessor) {
         this.predecessor = predecessor;
     }
 

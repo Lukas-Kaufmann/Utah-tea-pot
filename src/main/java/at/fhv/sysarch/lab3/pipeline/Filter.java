@@ -7,13 +7,20 @@ public class Filter<I, O> implements IFilter<I, O> {
     private ITransformer<I, O> transformer;
 
 
-    public Filter(ITransformer<I, O> transformer) {
+    private Filter(ITransformer<I, O> transformer) {
         this.transformer = transformer;
     }
 
+    public static <A, B> IFilter<A, B> ofTransformer(ITransformer<A, B> t) {
+        return new Filter<>(t);
+    }
+
     public O read() {
-        //TODO null handling
-        return this.transformer.transform(this.predecessor.read());
+        I prev = this.predecessor.read();
+        if (prev == null) {
+            return null;
+        }
+        return this.transformer.transform(prev);
     }
 
     public void write(I i) {

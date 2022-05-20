@@ -1,38 +1,65 @@
 package at.fhv.sysarch.lab3.pipeline;
 
 import at.fhv.sysarch.lab3.animation.AnimationRenderer;
+import at.fhv.sysarch.lab3.obj.ColoredFace;
+import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
+import at.fhv.sysarch.lab3.pipeline.filter.DepthSorter;
+import at.fhv.sysarch.lab3.pipeline.filter.ModelSource;
+import at.fhv.sysarch.lab3.pipeline.filter.Renderer;
+import at.fhv.sysarch.lab3.pipeline.tranformers.*;
+import com.hackoeur.jglm.Mat4;
+import com.hackoeur.jglm.Matrices;
 import javafx.animation.AnimationTimer;
 
 public class PullPipelineFactory {
+
+    public static void connectFilters(IFilter<?, ?> filter1, IFilter<?, ?> filter2) {
+        Pipe pipe = new Pipe();
+        pipe.setPredecessor(filter1);
+        filter2.setPredecessor(pipe);
+    }
+
+    /**Assumes the parameters are matching (e.g. filter1 = IFilter<?, O>, filter2 = Filter&lt;O, ?>)
+     * as assignments are done with Raw references
+     * @param filters
+     */
+    public static void chainFilters(IFilter<?, ?>... filters) {
+        if (filters.length <= 1) {
+            return;
+        }
+        for (int i = 0; i < filters.length - 1; i+=1) {
+            connectFilters(filters[i], filters[i+1]);
+        }
+    }
     public static AnimationTimer createPipeline(PipelineData pd) {
-        // TODO: pull from the source (model)
 
-        // TODO 1. perform model-view transformation from model to VIEW SPACE coordinates
+        ModelSource source = new ModelSource();
+        ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
+        IFilter<Face, Face> modelViewFilter = Filter.ofTransformer(modelViewTrans);
+        IFilter<Face, Face> depthSorter = new DepthSorter();
+        IFilter<Face, Face> backFaceCuller = Filter.ofTransformer(new BackfaceCuller());
 
-        // TODO 2. perform backface culling in VIEW SPACE
+        IFilter<Face, ColoredFace> coloringFilter = Filter.ofTransformer(new ColorTransformer(pd.getModelColor()));
+        IFilter<ColoredFace, ColoredFace> viewPortFilter = Filter.ofTransformer(new ViewPortTransformer(pd.getViewportTransform()));
+        IFilter<ColoredFace, ColoredFace> projectionFilter = Filter.ofTransformer(new ProjectionTransformer(pd.getProjTransform()));
+
+        IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
 
         // TODO 3. perform depth sorting in VIEW SPACE
-
-        // TODO 4. add coloring (space unimportant)
-
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
-            // 4a. TODO perform lighting in VIEW SPACE
-            
-            // 5. TODO perform projection transformation on VIEW SPACE coordinates
+            IFilter<ColoredFace, ColoredFace> shadingFilter = Filter.ofTransformer(new ShadingTransformer(pd.getLightPos()));
+            chainFilters(source, modelViewFilter, backFaceCuller, depthSorter, coloringFilter, shadingFilter, projectionFilter, viewPortFilter, sink);
         } else {
-            // 5. TODO perform projection transformation
+            chainFilters(source, modelViewFilter, backFaceCuller, coloringFilter, projectionFilter, viewPortFilter, sink);
         }
-
-        // TODO 6. perform perspective division to screen coordinates
-
-        // TODO 7. feed into the sink (renderer)
 
         // returning an animation renderer which handles clearing of the
         // viewport and computation of the praction
         return new AnimationRenderer(pd) {
-            // TODO rotation variable goes in here
+            private double rotationSpeed = 1;
+            private double currentRotation = 0;
 
             /** This method is called for every frame from the JavaFX Animation
              * system (using an AnimationTimer, see AnimationRenderer). 
@@ -41,15 +68,17 @@ public class PullPipelineFactory {
              */
             @Override
             protected void render(float fraction, Model model) {
-                // TODO compute rotation in radians
+                currentRotation += rotationSpeed * fraction;
+                currentRotation = currentRotation % (Math.PI * 2);
 
-                // TODO create new model rotation matrix using pd.getModelRotAxis and Matrices.rotate
+                Mat4 rotationMatrix = Matrices.rotate(
+                        (float) currentRotation,
+                        pd.getModelRotAxis()
+                );
+                modelViewTrans.setRotationMatrix(rotationMatrix);
 
-                // TODO compute updated model-view tranformation
-
-                // TODO update model-view filter
-
-                // TODO trigger rendering of the pipeline
+                source.setModel(model);
+                sink.read();
             }
         };
     }
