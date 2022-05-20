@@ -4,6 +4,7 @@ import at.fhv.sysarch.lab3.animation.AnimationRenderer;
 import at.fhv.sysarch.lab3.obj.ColoredFace;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.obj.Model;
+import at.fhv.sysarch.lab3.pipeline.filter.DepthSorter;
 import at.fhv.sysarch.lab3.pipeline.filter.ModelSource;
 import at.fhv.sysarch.lab3.pipeline.filter.Renderer;
 import at.fhv.sysarch.lab3.pipeline.tranformers.*;
@@ -38,6 +39,7 @@ public class PushPipelineFactory {
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
         IFilter<Face, Face> modelViewFilter = Filter.ofTransformer(modelViewTrans);
         IFilter<Face, Face> backFaceCuller = Filter.ofTransformer(new BackfaceCuller());
+        IFilter<Face, Face> depthSorter = new DepthSorter();
 
         IFilter<Face, ColoredFace> coloringFilter = Filter.ofTransformer(new ColorTransformer(pd.getModelColor()));
         IFilter<ColoredFace, ColoredFace> viewPortFilter = Filter.ofTransformer(new ViewPortTransformer(pd.getViewportTransform()));
@@ -48,9 +50,9 @@ public class PushPipelineFactory {
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
             IFilter<ColoredFace, ColoredFace> shadingFilter = Filter.ofTransformer(new ShadingTransformer(pd.getLightPos()));
-            chainFilters(source, modelViewFilter, backFaceCuller, coloringFilter, shadingFilter, projectionFilter, viewPortFilter, sink);
+            chainFilters(source, modelViewFilter, backFaceCuller, depthSorter, coloringFilter, shadingFilter, projectionFilter, viewPortFilter, sink);
         } else {
-            chainFilters(source, modelViewFilter, backFaceCuller, coloringFilter, projectionFilter, viewPortFilter, sink);
+            chainFilters(source, modelViewFilter, backFaceCuller, depthSorter, coloringFilter, projectionFilter, viewPortFilter, sink);
         }
 
         // returning an animation renderer which handles clearing of the

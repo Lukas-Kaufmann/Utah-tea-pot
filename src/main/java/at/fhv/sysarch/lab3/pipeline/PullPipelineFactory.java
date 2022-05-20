@@ -37,8 +37,8 @@ public class PullPipelineFactory {
         ModelSource source = new ModelSource();
         ModelViewTransformation modelViewTrans = new ModelViewTransformation(pd.getModelTranslation(), pd.getViewTransform());
         IFilter<Face, Face> modelViewFilter = Filter.ofTransformer(modelViewTrans);
-        IFilter<Face, Face> depthSorter = new DepthSorter();
         IFilter<Face, Face> backFaceCuller = Filter.ofTransformer(new BackfaceCuller());
+        IFilter<Face, Face> depthSorter = new DepthSorter();
 
         IFilter<Face, ColoredFace> coloringFilter = Filter.ofTransformer(new ColorTransformer(pd.getModelColor()));
         IFilter<ColoredFace, ColoredFace> viewPortFilter = Filter.ofTransformer(new ViewPortTransformer(pd.getViewportTransform()));
@@ -46,7 +46,6 @@ public class PullPipelineFactory {
 
         IFilter<ColoredFace, ?> sink = new Renderer(pd.getGraphicsContext(), pd.getRenderingMode());
 
-        // TODO 3. perform depth sorting in VIEW SPACE
         // lighting can be switched on/off
         if (pd.isPerformLighting()) {
             IFilter<ColoredFace, ColoredFace> shadingFilter = Filter.ofTransformer(new ShadingTransformer(pd.getLightPos()));

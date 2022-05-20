@@ -3,7 +3,6 @@ package at.fhv.sysarch.lab3.pipeline.filter;
 import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
-import com.hackoeur.jglm.Vec4;
 
 import java.util.*;
 
@@ -13,9 +12,6 @@ public class DepthSorter implements IFilter<Face, Face> {
     private Pipe<Face> successor;
     private PriorityQueue<Face> faceQueue = new PriorityQueue<>(this::compare);
     private boolean firstRead = true;
-
-    public DepthSorter() {
-    }
 
     @Override
     public Face read() {
@@ -43,7 +39,13 @@ public class DepthSorter implements IFilter<Face, Face> {
 
     @Override
     public void write(Face input) {
-        //TODO
+        if (!Face.isTerminatingFace(input)) {
+            this.faceQueue.add(input);
+        } else {
+            while (!this.faceQueue.isEmpty()) {
+                this.successor.write(this.faceQueue.poll());
+            }
+        }
     }
 
     public int compare(Face o1, Face o2) {

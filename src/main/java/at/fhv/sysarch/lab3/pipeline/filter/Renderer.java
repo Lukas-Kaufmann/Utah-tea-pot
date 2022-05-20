@@ -5,7 +5,6 @@ import at.fhv.sysarch.lab3.obj.Face;
 import at.fhv.sysarch.lab3.pipeline.IFilter;
 import at.fhv.sysarch.lab3.pipeline.Pipe;
 import at.fhv.sysarch.lab3.rendering.RenderingMode;
-import com.hackoeur.jglm.Vec4;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Renderer implements IFilter<ColoredFace, Face> {
@@ -26,7 +25,6 @@ public class Renderer implements IFilter<ColoredFace, Face> {
             ColoredFace face = this.predecessor.read();
             if (face != null) {
                 this.paint(face);
-                //TODO better terminator-mechanism
                 if (Face.isTerminatingFace(face)) {
                     looping = false;
                 }
@@ -51,7 +49,6 @@ public class Renderer implements IFilter<ColoredFace, Face> {
             context.strokePolygon(xPoints, yPoints, 3);
             if (rm == RenderingMode.FILLED) {
                 context.fillPolygon(xPoints, yPoints, 3);
-            } else {
             }
         }
     }
