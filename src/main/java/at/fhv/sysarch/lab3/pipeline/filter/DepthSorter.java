@@ -11,7 +11,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 
-public class DepthSorter implements IFilter<Face, Face>, Comparator<Face> {
+public class DepthSorter implements IFilter<Face, Face> {
 
     private Pipe<Face> predecessor;
     private Pipe<Face> successor;
@@ -25,7 +25,7 @@ public class DepthSorter implements IFilter<Face, Face>, Comparator<Face> {
     @Override
     public Face read() {
         if (firstRead) {
-            SortedSet<Face> faces = new TreeSet<Face>(this::compare);
+            PriorityQueue<Face> faceQueue = new PriorityQueue<>(this::compare);
             boolean looping = true;
             while (looping) {
                 Face prevFace = this.predecessor.read();
@@ -33,10 +33,10 @@ public class DepthSorter implements IFilter<Face, Face>, Comparator<Face> {
                     if (prevFace.getN1().equals(Vec4.VEC4_ZERO)) { //TODO better terminator
                         looping = false;
                     }
-                    faces.add(prevFace);
+                    faceQueue.add(prevFace);
                 }
             }
-            this.faceIterator = faces.iterator();
+            this.faceIterator = faceQueue.iterator();
             firstRead = false;
         }
 
@@ -52,45 +52,12 @@ public class DepthSorter implements IFilter<Face, Face>, Comparator<Face> {
         //TODO
     }
 
-    @Override
     public int compare(Face o1, Face o2) {
-        return (int) ((o1.getV1().getZ() - o2.getV1().getZ()) * 100 + 0.5);
-    }
+        float averageZ1 = (o1.getV1().getZ() + o1.getV2().getZ() + o1.getV3().getZ()) / 3;
+        float averageZ2 = (o2.getV1().getZ() + o2.getV2().getZ() + o2.getV3().getZ()) / 3;
 
-
-    @Override
-    public Comparator<Face> reversed() {
-        return Comparator.super.reversed();
-    }
-
-    @Override
-    public Comparator<Face> thenComparing(Comparator<? super Face> other) {
-        return Comparator.super.thenComparing(other);
-    }
-
-    @Override
-    public <U> Comparator<Face> thenComparing(Function<? super Face, ? extends U> keyExtractor, Comparator<? super U> keyComparator) {
-        return Comparator.super.thenComparing(keyExtractor, keyComparator);
-    }
-
-    @Override
-    public <U extends Comparable<? super U>> Comparator<Face> thenComparing(Function<? super Face, ? extends U> keyExtractor) {
-        return Comparator.super.thenComparing(keyExtractor);
-    }
-
-    @Override
-    public Comparator<Face> thenComparingInt(ToIntFunction<? super Face> keyExtractor) {
-        return Comparator.super.thenComparingInt(keyExtractor);
-    }
-
-    @Override
-    public Comparator<Face> thenComparingLong(ToLongFunction<? super Face> keyExtractor) {
-        return Comparator.super.thenComparingLong(keyExtractor);
-    }
-
-    @Override
-    public Comparator<Face> thenComparingDouble(ToDoubleFunction<? super Face> keyExtractor) {
-        return Comparator.super.thenComparingDouble(keyExtractor);
+//        return new Random().nextInt(2) - 1;
+        return (int) ((averageZ1 - averageZ2) * 100);
     }
 
     @Override
