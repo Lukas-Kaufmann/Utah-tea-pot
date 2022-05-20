@@ -52,7 +52,7 @@ public class PullPipelineFactory {
             IFilter<ColoredFace, ColoredFace> shadingFilter = Filter.ofTransformer(new ShadingTransformer(pd.getLightPos()));
             chainFilters(source, modelViewFilter, backFaceCuller, depthSorter, coloringFilter, shadingFilter, projectionFilter, viewPortFilter, sink);
         } else {
-            chainFilters(source, modelViewFilter, backFaceCuller, coloringFilter, projectionFilter, viewPortFilter, sink);
+            chainFilters(source, modelViewFilter, backFaceCuller, depthSorter, coloringFilter, projectionFilter, viewPortFilter, sink);
         }
 
         // returning an animation renderer which handles clearing of the

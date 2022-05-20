@@ -12,7 +12,6 @@ public class ColorTransformer implements ITransformer<Face, ColoredFace> {
         this.baseColor = baseColor;
     }
 
-
     @Override
     public ColoredFace transform(Face face) {
         return new ColoredFace(face, baseColor);

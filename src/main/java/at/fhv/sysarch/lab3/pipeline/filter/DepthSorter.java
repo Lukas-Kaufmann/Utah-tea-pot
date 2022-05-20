@@ -6,17 +6,12 @@ import at.fhv.sysarch.lab3.pipeline.Pipe;
 import com.hackoeur.jglm.Vec4;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 
 public class DepthSorter implements IFilter<Face, Face> {
 
     private Pipe<Face> predecessor;
     private Pipe<Face> successor;
-
-    private Iterator<Face> faceIterator;
+    private PriorityQueue<Face> faceQueue = new PriorityQueue<>(this::compare);
     private boolean firstRead = true;
 
     public DepthSorter() {
@@ -25,7 +20,7 @@ public class DepthSorter implements IFilter<Face, Face> {
     @Override
     public Face read() {
         if (firstRead) {
-            PriorityQueue<Face> faceQueue = new PriorityQueue<>(this::compare);
+            this.faceQueue.clear();
             boolean looping = true;
             while (looping) {
                 Face prevFace = this.predecessor.read();
@@ -36,11 +31,10 @@ public class DepthSorter implements IFilter<Face, Face> {
                     faceQueue.add(prevFace);
                 }
             }
-            this.faceIterator = faceQueue.iterator();
             firstRead = false;
         }
 
-        Face face = faceIterator.next();
+        Face face = faceQueue.poll();
         if (face.getN1().equals(Vec4.VEC4_ZERO)) { //TODO better terminator
             firstRead = true;
         }
@@ -56,8 +50,7 @@ public class DepthSorter implements IFilter<Face, Face> {
         float averageZ1 = (o1.getV1().getZ() + o1.getV2().getZ() + o1.getV3().getZ()) / 3;
         float averageZ2 = (o2.getV1().getZ() + o2.getV2().getZ() + o2.getV3().getZ()) / 3;
 
-//        return new Random().nextInt(2) - 1;
-        return (int) ((averageZ1 - averageZ2) * 100);
+        return Float.compare(averageZ1, averageZ2);
     }
 
     @Override
